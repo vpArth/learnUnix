@@ -1,4 +1,4 @@
-EXECUTABLES=ls cat info sh
+EXECUTABLES=ls cat info sh err
 
 .PHONY: clean add
 clean:

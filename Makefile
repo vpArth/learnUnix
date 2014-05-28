@@ -1,4 +1,4 @@
-EXECUTABLES=ls
+EXECUTABLES=ls cat
 
 .PHONY: clean add
 clean:

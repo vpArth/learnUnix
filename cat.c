@@ -23,7 +23,23 @@ int cat(FILE* in, FILE* out, FILE* err)
   return E_SUCCESS;
 }
 
+int catb(FILE* in, FILE* out, FILE* err)
+{
+  char c;
+  while ((c = getc(in)) != EOF) {
+    if (putc(c, out) == EOF) {
+      fprintf(err, "putc() error\n");
+      return E_WRITE_ERROR;
+    }
+  }
+  if (ferror(in)) {
+    fprintf(err, "getc() error\n");
+    return E_READ_ERROR;
+  }
+  return E_SUCCESS;
+}
+
 int main(int argc, char const *argv[])
 {
-  return cat(stdin, stdout, stderr);
+  return catb(stdin, stdout, stderr);
 }

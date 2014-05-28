@@ -1,6 +1,12 @@
 #include <stdio.h> /* printf */
 #include <sys/wait.h>
 
+void user_identify() {
+  printf("User identification\n");
+  printf("uid: %d\n", getuid());
+  printf("gid: %d\n", getgid());
+}
+
 int main(int argc, char const *argv[])
 {
   pid_t pid;
@@ -14,6 +20,7 @@ int main(int argc, char const *argv[])
     //parent branch
     printf("%d\tAfter fork\n", getpid());
     printf("%d\tChild pid: %d\n", getpid(), pid);
+    user_identify();
   }
   return 0;
 }

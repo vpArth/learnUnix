@@ -1,4 +1,4 @@
-EXECUTABLES=ls cat info sh err
+EXECUTABLES=ls cat info sh err sigs files fd
 
 .PHONY: clean add
 clean:

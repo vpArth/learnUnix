@@ -1,6 +1,5 @@
-#include <stdio.h>
-
-#include <dirent.h>
+#include <stdio.h> /* printf */
+#include <dirent.h> /* DIR, dirent, opendir, readdir */
 
 int main(int argc, char const *argv[])
 {

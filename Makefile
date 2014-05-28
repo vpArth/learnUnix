@@ -5,4 +5,5 @@ clean:
 	rm -f $(EXECUTABLES)
 add: clean
 	git add --all
+	git status
 

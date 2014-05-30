@@ -10,14 +10,17 @@ int fwide(FILE *fp, int mode);
 ```
 
 #### Standard IO streams
-`<stdio.h>`
+`<stdio.h>`  
+
  - stdin  (STDIN_FILENO)
  - stdout (STDOUT_FILENO)
  - stderr (STDERR_FILENO)
 
- #### Buferization
+####Buferization  
+
  Minimize read/write calls
- Types:
+ Types:  
+
   - full
   - byrow(\n)
   - no buferization
@@ -55,7 +58,8 @@ FILE *fdopen(int filedes, const char * type);
 
 int fclose(FILE *fp);
 ```
-Type param(b for binary mode, ignored by UNIX):
+Type param(b for binary mode, ignored by UNIX):  
+
  - `r/rb` - read only
  - `w/wb` - write only(also create/truncate)
  - `a/ab` - appendwrite(or create)
@@ -64,50 +68,52 @@ Type param(b for binary mode, ignored by UNIX):
  - `a+/a+b/ab+` - appendrw
  `fdopen` does not truncate file
 
- for + modes:
-  - we can't write after read without `fflush`/`fseek`/`fsetpos`/`rewind`
-  - we can't read after write without `fseek`/`fsetpos`/`rewind`/read op which get EOF
+ for + modes:  
+  
+  - we can't write after read without `fflush`/`fseek`/`fsetpos`/`rewind`  
+  - we can't read after write without `fseek`/`fsetpos`/`rewind`/read op which get EOF  
 
 ### Read/Write streams
-  - char by char
-  ```c
-    #include <stdio.h>
-    int getc(FILE *fp);
-    int fgetc(FILE *fp);//can't be macro(we have address and can operate with pointer)
-    int getchar(void); // getc(stdin);
-    //all returns char or EOF - (int)unsigned char
+  - char by char  
+```c
+  #include <stdio.h>
+  int getc(FILE *fp);
+  int fgetc(FILE *fp);//can't be macro(we have address and can operate with pointer)
+  int getchar(void); // getc(stdin);
+  //all returns char or EOF - (int)unsigned char
 
-    //Errors handling
-    int ferror(FILE *fp);
-    int feof(FILE *fp);
-    void clearerr(FILE *fp);
+  //Errors handling
+  int ferror(FILE *fp);
+  int feof(FILE *fp);
+  void clearerr(FILE *fp);
 
-    //put char back to stream
-    int ungetc(int c, FILE *fp);
+  //put char back to stream
+  int ungetc(int c, FILE *fp);
 
-    int putc(int c, FILE * fp);
-    int fputc(int c, FILE * fp);
-    int putchar(int c); // putc(c, stdout);
-  ```
+  int putc(int c, FILE * fp);
+  int fputc(int c, FILE * fp);
+  int putchar(int c); // putc(c, stdout);
+```
   - row by row
-  ```c
-    #include <stdio.h>
-    char *fgets(char *restrict buf, int n, FILE *restrict fp);
-    char *gets(char * buf);// buffer overflow risk!!
-    //returns buf or NULL(EOF or error)
+```c
+  #include <stdio.h>
+  char *fgets(char *restrict buf, int n, FILE *restrict fp);
+  char *gets(char * buf);// buffer overflow risk!!
+  //returns buf or NULL(EOF or error)
 
-    // \0 termimated str
-    int fputs(const char *restrict str, FILE *restrict fp);
-    int puts(const char * str);//adds \n
+  // \0 termimated str
+  int fputs(const char *restrict str, FILE *restrict fp);
+  int puts(const char * str);//adds \n
 
-  ```
+```
   - direct(binary) `fread`/`fwrite`
-  ```c
-    #include <stdio.h>
-    size_t fread(void *restrict ptr, size_t size, size_t nobj, FILE *restrict fp);
-    size_t fwrite(const void *restrict ptr, size_t size, size_t nobj,
-    FILE *restrict fp);  
-  ```
+
+```c
+  #include <stdio.h>
+  size_t fread(void *restrict ptr, size_t size, size_t nobj, FILE *restrict fp);
+  size_t fwrite(const void *restrict ptr, size_t size, size_t nobj,
+  FILE *restrict fp);
+```
 
 ### Stream positioning
  - `ftell`/`fseek`
@@ -139,15 +145,16 @@ int snprintf(char *restrict buf, size_t n, const char *restrict format, ...);
 
 Format specification:  
 `%[flags][fldwidth][precision][lenmodifier]convtype`  
- - flags
+
+  - flags
     - `-` - `align: left`
     - `+` - show sign
     - ` ` - space if no sign
     - `#` - alt.form ( 0x123f )
     - `0` - zerofill
- - fldwidth - min-width `\d+|\*` (* - get from arg(before value))
- - precision - min-decimal-float `.(?:\d+|\*)`
- - len
+  - fldwidth - min-width `\d+|\*` (* - get from arg(before value))
+  - precision - min-decimal-float `.(?:\d+|\*)`
+  - len
     - `hh` - char
     - `h`  - short
     - `l`  - long|wide
@@ -155,7 +162,7 @@ Format specification:
     - `z`  - size_t
     - `t`  - ptrdiff_t
     - `L`  - long double
- - convtype
+  - convtype
     - `d`, `i` - signed decimal
     - `u` - unsigned decimal
     - `o` - unsigned octal
@@ -172,7 +179,7 @@ Format specification:
     - `C` - wide_t
     - `S` - wide_t[]
 
-Vararg variation:  
+Vararg variation:
 ```c
   #include <stdarg.h>
   #include <stdio.h>
@@ -183,7 +190,7 @@ Vararg variation:
   int vsnprintf(char *restrict buf, size_t n, const char *restrict format, va_list arg);
 ```
 
-#### Format Input:
+#### Format Input:  
 ```c
   #include <stdio.h>
   int scanf(const char *restrict format, ...);
@@ -201,7 +208,8 @@ Vararg variation:
   int vsscanf(const char *restrict buf, const char *restrict format, va_list arg);
 ```
 
-___________
+___________  
+
 ```c
   #include <stdio.h>
   int fileno(FILE *fp);//get fd number
@@ -209,7 +217,7 @@ ___________
   char *tmpnam(char *ptr); // uniq filename
   char *tempnam(const char *directory, const char *prefix);
   FILE *tmpfile(void); // temp file
-  
+
   #include <stdlib.h>
-  int mkstemp(char *template);  
+  int mkstemp(char *template);
 ```

@@ -135,8 +135,9 @@ It:
  - functions from standard i/o library  
 
 Here list of safe functions:  
-|   |   |   |   |   |  
-|---|---|---|---|---|  
+
+    |     |     |     |   
+--- | --- | --- | --- | ---  
 accept | fchmod | lseek | sendto | stat
 access | fchown | lstat | setgid | symlink
 aio_error | fcntl | mkdir | setpgid | sysconf377

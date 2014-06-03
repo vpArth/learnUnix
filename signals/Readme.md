@@ -16,7 +16,9 @@
   - default / SIG_DFL
 
 ####Signals  
-  *name*  | *description* | *default action*           | *remarks*
+ 
+  name  | description | default action | remarks  
+  --- | --- | --- | ---
   SIGABRT | abort | exit+core                          | abort() 
   SIGALRM | timer reached | exit                       | alarm(), setitimer()
   SIGHUP | disconnect | exit                           | can reaches bg processes
@@ -133,10 +135,11 @@ It:
  - functions from standard i/o library  
 
 Here list of safe functions:  
+|   |   |   |   |   |  
+|---|---|---|---|---|  
 accept | fchmod | lseek | sendto | stat
 access | fchown | lstat | setgid | symlink
 aio_error | fcntl | mkdir | setpgid | sysconf377
-10 |.6 |. | Реентерабельные | функции
 aio_return | fdatasync | mkfifo | setsid | tcdrain
 aio_suspend | fork | open | setsockopt | tcflow
 alarm | fpathconf | pathconf | setuid | tcflush
@@ -168,10 +171,11 @@ int kill(pid_t pid, int signo);
 int raise(int signo); // kill(getpid(), signo);
 ```
 `pid`:  
- -<-1 - to `pgid`==abs(`pid`)
- -  0 - to `pgid`==getpid()
- - >0 - to `pid`
- - -1 - to all, which can
+
+ - `<-1` - to `pgid`==abs(`pid`)
+ -  `0` - to `pgid`==getpid()
+ - `>0` - to `pid`
+ - `-1` - to all, which can
 
 ```c
 #include <unistd.h>
@@ -201,7 +205,8 @@ if `oset` is not null pointer it sets to current mask
 
 ```c
 #include <signal.h>
-int sigpending(sigset_t *set);// return set locked and triggered signals set
+int sigpending(sigset_t *set); 
+// return set locked and triggered signals set
 ```
 
 ####sigaction  

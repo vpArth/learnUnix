@@ -277,5 +277,123 @@ Sigfunc *signal(int signo, Sigfunc *func)
 
 ```c
 #include <signal.h>
-    int sigsuspend(const sigset_t *sigmask);
+    int sigsuspend(const sigset_t *sigmask); //set signal mask and pause
+```
+
+```c
+#include <stdlib.h>
+void abort(void); // raise(SIGABRT) and always exit process
+```
+
+####System()
+```c
+#include <unistd.h>
+#include <signal.h>
+#include <sys/wait.h>
+#include <errno.h>
+int system(const char *cmdstring) /* предусматривает обработку сигналов */
+{
+  pid_t pid;
+  int status;
+  struct sigaction ignore, saveintr, savequit;
+  sigset_t chldmask, savemask;
+
+  if (cmdstring == NULL) return(1); /* UNIX всегда поддерживает командный процессор */
+  
+  ignore.sa_handler = SIG_IGN; /* игнорировать SIGINT и SIGQUIT */
+  sigemptyset(&ignore.sa_mask);
+  ignore.sa_flags = 0;
+  
+  if (sigaction(SIGINT, &ignore, &saveintr) < 0) return( 1);
+  if (sigaction(SIGQUIT, &ignore, &savequit) < 0) return( 1);
+  sigemptyset(&chldmask);
+  /* заблокировать SIGCHLD */
+  sigaddset(&chldmask, SIGCHLD);
+  if (sigprocmask(SIG_BLOCK, &chldmask, &savemask) < 0) return( 1);
+  
+  if ((pid = fork()) < 0) {
+    status = 1;
+    /* вероятно, превышено максимальное количество процессов */
+  } else if (pid == 0) {
+    /* дочерний процесс */
+    /* восстановить предыдущие действия сигналов и сбросить маску */
+    sigaction(SIGINT, &saveintr, NULL);
+    sigaction(SIGQUIT, &savequit, NULL);
+    sigprocmask(SIG_SETMASK, &savemask, NULL);
+    execl("/bin/sh", "sh", " c", cmdstring, (char *)0);
+    _exit(127);
+    /* ошибка вызова функции exec */
+  } else {
+    /* родительский процесс */
+    while (waitpid(pid, &status, 0) < 0)
+      if (errno != EINTR) {
+        status = 1;
+        /* получен код ошибки, отличный от EINTR */
+        break;
+      }
+  }
+  /* восстановить предыдущие действия сигналов и сбросить маску */
+  if (sigaction(SIGINT, &saveintr, NULL) < 0) return( 1);
+  if (sigaction(SIGQUIT, &savequit, NULL) < 0) return( 1);
+  if (sigprocmask(SIG_SETMASK, &savemask, NULL) < 0) return( 1);
+  return(status);
+}
+```
+
+####sleep()
+
+```c
+
+    #include <unistd.h>
+    unsigned int sleep(unsigned int seconds);// return 0 or seconds remaining, if interrupted by some signal
+```
+
+Sample implementation:  
+```c
+
+    static void sig_alrm(int signo) {}
+    unsigned int sleep(unsigned int nsecs)
+    {
+      struct sigaction newact, oldact;
+      sigset_t newmask, oldmask, suspmask;
+      unsigned int unslept;
+      /* установить свой обработчик, сохранив предыдущую информацию */
+      newact.sa_handler = sig_alrm;
+      sigemptyset(&newact.sa_mask);
+      newact.sa_flags = 0;
+      sigaction(SIGALRM, &newact, &oldact);
+      
+      /* заблокировать сигнал SIGALRM и сохранить текущую маску сигналов */
+      sigemptyset(&newmask);
+      sigaddset(&newmask, SIGALRM);
+      sigprocmask(SIG_BLOCK, &newmask, &oldmask);
+      
+      alarm(nsecs);
+      
+      suspmask = oldmask;
+      sigdelset(&suspmask, SIGALRM);/* убедиться, что SIGALRM не заблокирован */
+      sigsuspend(&suspmask); /* дождаться, пока не будет перехвачен какой либо сигнал */
+      /* был перехвачен некоторый сигнал, сейчас SIGALRM заблокирован */
+      unslept = alarm(0);
+      sigaction(SIGALRM, &oldact, NULL); /* восстановить предыдущее действие */
+      /* восстановить маску сигналов, в которой сигнал SIGALRM разблокирован */
+      sigprocmask(SIG_SETMASK, &oldmask, NULL);
+      return(unslept);
+    }
+```
+
+####Aux  
+```c
+extern char *sys_siglist[]; // global array with signal names
+#include <signal.h>
+void psignal(int signo, const char *msg); // "str: sig_decr\n" >> stderr
+#include <string.h>
+char *strsignal(int signo); // returns sig decription
+```
+
+Signal names:  
+```c
+#include <signal.h>
+int sig2str(int signo, char *str);
+int str2sig(const char *str, int *signop);
 ```
